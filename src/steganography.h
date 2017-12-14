@@ -51,7 +51,7 @@ namespace steg {
         static void LSB_encode(std::string name, std::string message);
 
 
-        // static void LSB_decode(std::string name);
+        static void LSB_decode(std::string name);
     };
 }
 
