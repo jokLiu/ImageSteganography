@@ -11,9 +11,6 @@ using namespace cimg_library;
 
 namespace steg {
 
-	#define ENCODE_SIZE 64
-	#define BIT_TO_BYTE 8
-
 	void enocde_length(uint64_t msg_length, 
     	CImg<unsigned char>& image);
 
@@ -21,7 +18,10 @@ namespace steg {
 
 	std::pair<int,int> encode_single_byte(uint8_t to_encode, 
     	CImg<unsigned char>& image,
-    	std::pair<int, int> coord);
+    	std::pair<int, int>& coord);
+
+	char decode_single_byte(CImg<unsigned char>& image,
+    	std::pair<int, int>& coord);
 
 	// first 64 pixels encodes the length of the message in bytes
     // message has to be of at least 64x64 size
@@ -47,15 +47,43 @@ namespace steg {
 
     }
 
-    void StegCoding::LSB_decode(std::string name){
+    std::string StegCoding::LSB_decode(std::string name){
     	CImg<unsigned char> src(name.c_str());
-
+    	std::string message = "";
     	uint64_t msg_length = 0;
 
-    	// decode length
-    	msg_length = decode_length(src);
-    	std::cout << msg_length << "\n";
+    	// decode length and translate it to bits
+    	msg_length = decode_length(src) * BIT_TO_BYTE + ENCODE_SIZE;
+
     	// decode message
+    	int height = src.height();
+    	int width = src.width();
+    	int total_pixels = width * height;
+    	char t ;
+    	auto coord = std::make_pair(ENCODE_SIZE, 0);
+    	for(int nr=ENCODE_SIZE; nr<total_pixels && nr < msg_length; nr+=BIT_TO_BYTE){
+    		coord.first = nr % width; // width
+    		coord.second = nr / width; //height
+    		t = decode_single_byte(src, coord);
+    		message += t;
+    	}
+    	return message;
+    }
+
+    char decode_single_byte(CImg<unsigned char>& image,
+    	std::pair<int, int>& coord){
+    	int bit = 0;
+    	uint8_t to_decode = 0;
+    	int w = coord.first;
+    	int count = 0;
+    	for(int h = coord.second; h<image.height(); h++){
+    		for(; w<image.width() && count < BIT_TO_BYTE; w++, count++){
+    			bit = image(w, h, 1) & 1U;
+    			to_decode <<= 1;
+    			to_decode ^= (-bit ^ to_decode) & 1U;
+    		}
+    	}
+    	return to_decode;
     }
 
     uint64_t decode_length(CImg<unsigned char>& image){
@@ -69,6 +97,8 @@ namespace steg {
     	return msg_length;
 
     }
+
+
 
     void enocde_length(uint64_t msg_length, 
     	CImg<unsigned char>& image){
@@ -84,9 +114,9 @@ namespace steg {
 
     std::pair<int,int> encode_single_byte(uint8_t to_encode, 
     	CImg<unsigned char>& image,
-    	std::pair<int, int> coord){
-    	uint8_t shift_count = BIT_TO_BYTE - 1;
-    	uint8_t bit;
+    	std::pair<int, int>& coord){
+    	int shift_count = BIT_TO_BYTE - 1;
+    	int bit;
     	int w = coord.first;
     	for(int h = coord.second; h<image.height(); h++){
     		for(; w<image.width(); w++){

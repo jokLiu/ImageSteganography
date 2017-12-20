@@ -8,6 +8,10 @@
 #include <string>
 
 namespace steg {
+
+    #define ENCODE_SIZE 64
+    #define BIT_TO_BYTE 8
+
     class StegCoding {
     public:
         // Encodes the image of the given name (and path to the image)
@@ -51,7 +55,7 @@ namespace steg {
         static void LSB_encode(std::string name, std::string message);
 
 
-        static void LSB_decode(std::string name);
+        static std::string LSB_decode(std::string name);
     };
 }
 
