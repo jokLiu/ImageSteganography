@@ -9,11 +9,15 @@
 
 namespace steg {
 
-    #define ENCODE_SIZE 64
-    #define BIT_TO_BYTE 8
+#define ENCODE_SIZE 64
+#define BIT_TO_BYTE 8
+#define RED 0
+#define GREEN 1
+#define BLUE 2
 
     class StegCoding {
     public:
+
         // Encodes the image of the given name (and path to the image)
         // using the Least Significant Bit (LSB) method where each pixel
         // in the image is modified and it's least significant bit is
@@ -56,6 +60,19 @@ namespace steg {
 
 
         static std::string LSB_decode(std::string name);
+
+
+        static void LSB_encode_odd(std::string name, std::string message);
+
+
+        static std::string LSB_decode_odd(std::string name);
+
+
+        static void LSB_encode_even(std::string name, std::string message);
+
+
+        static std::string LSB_decode_even(std::string name);
+
     };
 }
 
