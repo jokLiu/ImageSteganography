@@ -150,7 +150,6 @@ namespace steg {
         // decode length and translate it to bits
         Args args{1, 0};
         msg_length = LSB_decode_length_odd_even(src, args) * BIT_TO_BYTE * 2 + ENCODE_SIZE * 2 + 1;
-        std::cout << msg_length << "\n";
 
         // decode message
         int height = src.height();
@@ -199,7 +198,6 @@ namespace steg {
         // decode length and translate it to bits
         Args args{0, 0};
         msg_length = LSB_decode_length_odd_even(src, args) * BIT_TO_BYTE * 2 + ENCODE_SIZE * 2;
-        std::cout << msg_length << "\n";
 
         // decode message
         int height = src.height();

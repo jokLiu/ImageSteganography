@@ -73,6 +73,12 @@ namespace steg {
 
         static std::string LSB_decode_even(std::string name);
 
+
+        static void LSB_encode_prime(std::string name, std::string message);
+
+
+        static std::string LSB_decode_prime(std::string name);
+
     };
 }
 
