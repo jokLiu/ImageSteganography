@@ -79,6 +79,18 @@ namespace steg {
 
         static std::string LSB_decode_prime(std::string name);
 
+
+        static void LSB_encode_max(std::string name, std::string message);
+
+
+        static std::string LSB_decode_max(std::string name);
+
+        
+        static void LSB_encode_min(std::string name, std::string message);
+
+
+        static std::string LSB_decode_min(std::string name);
+
     };
 }
 
