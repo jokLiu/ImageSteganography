@@ -19,6 +19,13 @@ namespace steg {
 
     static int find_min_location(CImg<unsigned char> &image, int height);
 
+    static std::string generic_min_max_decode(std::string name,
+                                              const std::function<int(CImg<unsigned char> &, int)> &f);
+
+    static void generic_min_max_encode(std::string name,
+                                       std::string message,
+                                       const std::function<int(CImg<unsigned char> &, int)> &f);
+
     void encode_length(uint64_t msg_length,
                        CImg<unsigned char> &image,
                        const std::function<int(CImg<unsigned char> &, int)> &f);
@@ -36,21 +43,6 @@ namespace steg {
                             const std::function<int(CImg<unsigned char> &, int)> &f,
                             int64_t height);
 
-    void StegCoding::LSB_encode_max(std::string name, std::string message) {
-        CImg<unsigned char> src(name.c_str());
-        uint64_t msg_length = message.length();
-
-        // TODO check whether width is enough
-        encode_length(msg_length, src, find_max_location);
-
-        int64_t height = ENCODE_SIZE;
-        for (char c : message) {
-            encode_single_byte(c, src, find_max_location, height);
-            height += BIT_TO_BYTE;
-        }
-
-        src.save(name.c_str());
-    }
 
     void encode_single_byte(
             uint8_t to_encode,
@@ -85,20 +77,6 @@ namespace steg {
         }
 
         return to_decode;
-    }
-
-
-    std::string StegCoding::LSB_decode_max(std::string name) {
-
-        CImg<unsigned char> src(name.c_str());
-        uint64_t msg_length = decode_length(src, find_max_location);
-        msg_length += ENCODE_SIZE;
-        std::string message = "";
-
-        for (int h = ENCODE_SIZE; h < msg_length && h < src.width(); h += BIT_TO_BYTE) {
-            message += decode_single_byte(src, find_max_location, h);
-        }
-        return message;
     }
 
 
@@ -160,34 +138,55 @@ namespace steg {
     }
 
 
+    void StegCoding::LSB_encode_max(std::string name, std::string message) {
+        generic_min_max_encode(name, message, find_max_location);
+    }
+
+
+    std::string StegCoding::LSB_decode_max(std::string name) {
+        return generic_min_max_decode(name, find_max_location);
+    }
+
+
     void StegCoding::LSB_encode_min(std::string name, std::string message) {
-        CImg<unsigned char> src(name.c_str());
-        uint64_t msg_length = message.length();
-
-        // TODO check whether width is enough
-        encode_length(msg_length, src, find_min_location);
-
-        int64_t height = ENCODE_SIZE;
-        for (char c : message) {
-            encode_single_byte(c, src, find_min_location, height);
-            height += BIT_TO_BYTE;
-        }
-
-        src.save(name.c_str());
+        generic_min_max_encode(name, message, find_min_location);
     }
 
 
     std::string StegCoding::LSB_decode_min(std::string name) {
+        return generic_min_max_decode(name, find_min_location);
+    }
 
+    static std::string generic_min_max_decode(std::string name,
+                                              const std::function<int(CImg<unsigned char> &, int)> &f) {
         CImg<unsigned char> src(name.c_str());
-        uint64_t msg_length = decode_length(src, find_min_location);
+        uint64_t msg_length = decode_length(src, f);
         msg_length += ENCODE_SIZE;
         std::string message = "";
 
         for (int h = ENCODE_SIZE; h < msg_length && h < src.width(); h += BIT_TO_BYTE) {
-            message += decode_single_byte(src, find_min_location, h);
+            message += decode_single_byte(src, f, h);
         }
         return message;
+    }
+
+
+    static void generic_min_max_encode(std::string name,
+                                       std::string message,
+                                       const std::function<int(CImg<unsigned char> &, int)> &f) {
+        CImg<unsigned char> src(name.c_str());
+        uint64_t msg_length = message.length();
+
+        // TODO check whether width is enough
+        encode_length(msg_length, src, f);
+
+        int64_t height = ENCODE_SIZE;
+        for (char c : message) {
+            encode_single_byte(c, src, f, height);
+            height += BIT_TO_BYTE;
+        }
+
+        src.save(name.c_str());
     }
 
 }
