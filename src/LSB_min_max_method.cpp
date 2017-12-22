@@ -159,4 +159,35 @@ namespace steg {
         return min_loc;
     }
 
+
+    void StegCoding::LSB_encode_min(std::string name, std::string message) {
+        CImg<unsigned char> src(name.c_str());
+        uint64_t msg_length = message.length();
+
+        // TODO check whether width is enough
+        encode_length(msg_length, src, find_min_location);
+
+        int64_t height = ENCODE_SIZE;
+        for (char c : message) {
+            encode_single_byte(c, src, find_min_location, height);
+            height += BIT_TO_BYTE;
+        }
+
+        src.save(name.c_str());
+    }
+
+
+    std::string StegCoding::LSB_decode_min(std::string name) {
+
+        CImg<unsigned char> src(name.c_str());
+        uint64_t msg_length = decode_length(src, find_min_location);
+        msg_length += ENCODE_SIZE;
+        std::string message = "";
+
+        for (int h = ENCODE_SIZE; h < msg_length && h < src.width(); h += BIT_TO_BYTE) {
+            message += decode_single_byte(src, find_min_location, h);
+        }
+        return message;
+    }
+
 }
