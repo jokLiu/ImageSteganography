@@ -65,7 +65,6 @@ namespace steg {
 
         int bit, w, h, prime;
         int width = image.width();
-        int total = image.height() * width;
 
         // encoding the size to the picture
         for (int i = 0, j = ENCODE_SIZE - 1;
