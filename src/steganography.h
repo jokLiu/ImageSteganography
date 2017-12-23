@@ -97,6 +97,13 @@ namespace steg {
 
         static std::string LSB_decode_spiral(std::string name);
 
+
+        static void LSB_encode_magic_sq(std::string name, std::string message);
+
+
+        static std::string LSB_decode_magic_sq(std::string name);
+
+
     };
 }
 
