@@ -35,18 +35,17 @@ using namespace cimg_library;
 namespace steg {
 
 
-    void LSB_enocde_length(uint64_t msg_length,
+    static char LSB_decode_single_byte(CImg<unsigned char> &image,
+                                std::pair<int, int> &coord) ;
+
+    static uint64_t LSB_decode_length(CImg<unsigned char> &image);
+
+    static void LSB_enocde_length(const uint64_t msg_length,
                            CImg<unsigned char> &image);
 
-    uint64_t LSB_decode_length(CImg<unsigned char> &image);
-
-    std::pair<int, int> LSB_encode_single_byte(uint8_t to_encode,
+    static std::pair<int, int> LSB_encode_single_byte(uint8_t to_encode,
                                                CImg<unsigned char> &image,
                                                std::pair<int, int> &coord);
-
-    char LSB_decode_single_byte(CImg<unsigned char> &image,
-                                std::pair<int, int> &coord);
-
 
     void StegCoding::LSB_encode(const std::string& name, const std::string& message) {
         CImg<unsigned char> src(name.c_str());
@@ -93,7 +92,7 @@ namespace steg {
         return message;
     }
 
-    char LSB_decode_single_byte(CImg<unsigned char> &image,
+    static char LSB_decode_single_byte(CImg<unsigned char> &image,
                                 std::pair<int, int> &coord) {
         // bit to be retrieved from a single pixel
         int bit = 0; 
@@ -115,7 +114,7 @@ namespace steg {
         return to_decode;
     }
 
-    uint64_t LSB_decode_length(CImg<unsigned char> &image) {
+    static uint64_t LSB_decode_length(CImg<unsigned char> &image) {
         uint64_t msg_length = 0;
         int bit;
         for (int i = 0; i < ENCODE_SIZE; i++) {
@@ -131,7 +130,7 @@ namespace steg {
     }
 
 
-    void LSB_enocde_length(uint64_t msg_length,
+    static void LSB_enocde_length(const uint64_t msg_length,
                            CImg<unsigned char> &image) {
 
         int bit;
@@ -145,7 +144,7 @@ namespace steg {
         }
     }
 
-    std::pair<int, int> LSB_encode_single_byte(uint8_t to_encode,
+    static std::pair<int, int> LSB_encode_single_byte(uint8_t to_encode,
                                                CImg<unsigned char> &image,
                                                std::pair<int, int> &coord) {
         int shift_count = BIT_TO_BYTE - 1;

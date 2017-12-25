@@ -15,39 +15,31 @@ namespace steg {
 
 
     struct Args {
-        // Args() : w(0), h(0) {}
         int w;
         int h;
     };
 
-    std::pair<int, int> LSB_encode_length_odd_even(uint64_t msg_length,
-                                                   CImg<unsigned char> &image, Args args);
+   static std::pair<int, int> LSB_encode_length_odd_even(uint64_t msg_length,
+                                                   CImg<unsigned char> &image, 
+                                                   const Args args);
 
+   static uint64_t LSB_decode_length_odd_even(const CImg<unsigned char> &image,
+                                        const Args args);
 
-    std::pair<int, int> LSB_encode_single_byte_odd(
+   static std::pair<int, int> LSB_encode_single_byte_odd(
             uint8_t to_encode,
             CImg<unsigned char> &image,
             std::pair<int, int> &coord);
+   static char LSB_decode_single_byte_odd(const CImg<unsigned char> &image,
+                                    const std::pair<int, int> &coord) ;
 
-    uint64_t LSB_decode_length_odd_even(CImg<unsigned char> &image,
-                                        Args args);
-
-
-    char LSB_decode_single_byte_odd(CImg<unsigned char> &image,
-                                    std::pair<int, int> &coord);
-
-
-    void StegCoding::LSB_encode_odd(std::string name, std::string message) {
+    void StegCoding::LSB_encode_odd(const std::string name, const std::string message) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
-        assert(src.width() >= 64 &&
-               src.height() >= 64 &&
-               src.width() * src.height() / BIT_TO_BYTE >=
-               ENCODE_SIZE + msg_length);
+        assert(src.width() >= 64 && src.height() >= 64);
 
         // encode length of the text
-        // Args args {1, 0, [](int& k){k+=2;}};
         Args args{1, 0};
         auto coord = LSB_encode_length_odd_even(msg_length, src, args);
 
@@ -59,8 +51,74 @@ namespace steg {
         src.save(name.c_str());
     }
 
-    std::pair<int, int> LSB_encode_length_odd_even(uint64_t msg_length,
-                                                   CImg<unsigned char> &image, Args args) {
+
+     std::string StegCoding::LSB_decode_odd(const std::string name) {
+        CImg<unsigned char> src(name.c_str());
+        std::string message = "";
+        uint64_t msg_length = 0;
+
+        // decode length and translate it to bits
+        Args args{1, 0};
+        msg_length = LSB_decode_length_odd_even(src, args) * BIT_TO_BYTE * 2 + ENCODE_SIZE * 2 + 1;
+
+        // decode message
+        int width = src.width();
+        int total_pixels = width * src.height();
+
+        auto coord = std::make_pair(ENCODE_SIZE, 0);
+        for (int nr = 1 + ENCODE_SIZE * 2; nr < total_pixels && nr < msg_length;
+               nr += BIT_TO_BYTE * 2) {
+            coord.first = nr % width; // width
+            coord.second = nr / width; //height
+            message += LSB_decode_single_byte_odd(src, coord);    
+        }
+
+        return message;
+    }
+
+     void StegCoding::LSB_encode_even(const std::string name, const std::string message) {
+        CImg<unsigned char> src(name.c_str());
+        uint64_t msg_length = message.length();
+
+        assert(src.width() >= 64 && src.height() >= 64);
+
+        // encode length of the text
+        Args args{0, 0};
+        auto coord = LSB_encode_length_odd_even(msg_length, src, args);
+
+        // encoding the message
+        for (char c : message) {
+            coord = LSB_encode_single_byte_odd(c, src, coord);
+        }
+
+        src.save(name.c_str());
+    }
+
+    std::string StegCoding::LSB_decode_even(const std::string name) {
+        CImg<unsigned char> src(name.c_str());
+        std::string message = "";
+        uint64_t msg_length = 0;
+
+        // decode length and translate it to bits
+        Args args{0, 0};
+        msg_length = LSB_decode_length_odd_even(src, args) * BIT_TO_BYTE * 2 + ENCODE_SIZE * 2;
+
+        // decode message
+        int width = src.width();
+        int total_pixels = width * src.height();
+
+        auto coord = std::make_pair(ENCODE_SIZE, 0);
+        for (int nr = ENCODE_SIZE * 2; nr < total_pixels && nr < msg_length; nr += BIT_TO_BYTE * 2) {
+            coord.first = nr % width; // width
+            coord.second = nr / width; //height
+            message += LSB_decode_single_byte_odd(src, coord);
+        }
+        return message;
+    }
+
+    static std::pair<int, int> LSB_encode_length_odd_even(uint64_t msg_length,
+                                                   CImg<unsigned char> &image, 
+                                                   const Args args) {
 
         int bit, w, h, i, j;
         int width = image.width();
@@ -81,8 +139,8 @@ namespace steg {
         return std::make_pair(i % width, i / width);
     }
 
-    uint64_t LSB_decode_length_odd_even(CImg<unsigned char> &image,
-                                        Args args) {
+    static uint64_t LSB_decode_length_odd_even(const CImg<unsigned char> &image,
+                                        const Args args) {
         uint64_t msg_length = 0;
         int width = image.width();
         int total = image.height() * width;
@@ -99,7 +157,7 @@ namespace steg {
         return msg_length;
     }
 
-    std::pair<int, int> LSB_encode_single_byte_odd(
+    static std::pair<int, int> LSB_encode_single_byte_odd(
             uint8_t to_encode,
             CImg<unsigned char> &image,
             std::pair<int, int> &coord) {
@@ -125,8 +183,8 @@ namespace steg {
 
     }
 
-    char LSB_decode_single_byte_odd(CImg<unsigned char> &image,
-                                    std::pair<int, int> &coord) {
+    static char LSB_decode_single_byte_odd(const CImg<unsigned char> &image,
+                                    const std::pair<int, int> &coord) {
         int bit = 0;
         uint8_t to_decode = 0;
         int w = coord.first;
@@ -142,77 +200,7 @@ namespace steg {
         return to_decode;
     }
 
-    std::string StegCoding::LSB_decode_odd(std::string name) {
-        CImg<unsigned char> src(name.c_str());
-        std::string message = "";
-        uint64_t msg_length = 0;
-
-        // decode length and translate it to bits
-        Args args{1, 0};
-        msg_length = LSB_decode_length_odd_even(src, args) * BIT_TO_BYTE * 2 + ENCODE_SIZE * 2 + 1;
-
-        // decode message
-        int height = src.height();
-        int width = src.width();
-        int total_pixels = width * height;
-
-        char t;
-        auto coord = std::make_pair(ENCODE_SIZE, 0);
-        for (int nr = 1 + ENCODE_SIZE * 2; nr < total_pixels && nr < msg_length; nr += BIT_TO_BYTE * 2) {
-            coord.first = nr % width; // width
-            coord.second = nr / width; //height
-            t = LSB_decode_single_byte_odd(src, coord);
-            message += t;
-        }
-        return message;
-    }
-
-
-    void StegCoding::LSB_encode_even(std::string name, std::string message) {
-        CImg<unsigned char> src(name.c_str());
-        uint64_t msg_length = message.length();
-
-        assert(src.width() >= 64 &&
-               src.height() >= 64 &&
-               src.width() * src.height() / BIT_TO_BYTE >=
-               ENCODE_SIZE + msg_length);
-
-        // encode length of the text
-        // Args args {1, 0, [](int& k){k+=2;}};
-        Args args{0, 0};
-        auto coord = LSB_encode_length_odd_even(msg_length, src, args);
-
-        // encoding the message
-        for (char c : message) {
-            coord = LSB_encode_single_byte_odd(c, src, coord);
-        }
-
-        src.save(name.c_str());
-    }
-
-    std::string StegCoding::LSB_decode_even(std::string name) {
-        CImg<unsigned char> src(name.c_str());
-        std::string message = "";
-        uint64_t msg_length = 0;
-
-        // decode length and translate it to bits
-        Args args{0, 0};
-        msg_length = LSB_decode_length_odd_even(src, args) * BIT_TO_BYTE * 2 + ENCODE_SIZE * 2;
-
-        // decode message
-        int height = src.height();
-        int width = src.width();
-        int total_pixels = width * height;
-
-        char t;
-        auto coord = std::make_pair(ENCODE_SIZE, 0);
-        for (int nr = ENCODE_SIZE * 2; nr < total_pixels && nr < msg_length; nr += BIT_TO_BYTE * 2) {
-            coord.first = nr % width; // width
-            coord.second = nr / width; //height
-            t = LSB_decode_single_byte_odd(src, coord);
-            message += t;
-        }
-        return message;
-    }
+   
+   
 
 }

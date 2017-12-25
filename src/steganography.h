@@ -113,16 +113,157 @@ namespace steg {
         static std::string LSB_decode(const std::string& name);
 
 
-        static void LSB_encode_odd(std::string name, std::string message);
+        /************************************************
+         * Encodes the message into the image which name is passed to 
+         * the function using the LSB method with each bit encoded in
+         * every odd location of the image provided where every odd
+         * pixel in the image is modified and it's least 
+         * significant bit is replaced with the the one of the given 
+         * message which has to be hidden. Then it replaces the actual
+         * image with the new stego image with the message hidden in it.
+         *
+         * Image to encode has to be of the "png" file format, and
+         * all the data is at the moment hidden in the BLUE pixels
+         * as it is the least sensitive to the human eye.
+         *
+         * First of all the length of the message is encoded into first
+         * 64 odd pixels of the image, this provides the max message 
+         * size of 2^64 which is very unlikely to be exceeded (heh).
+         *
+         * At the moment image has to be of at least 64x64 size.
+         * 
+         **************************************************
+         *
+         * The example of the possible encoding:
+         * Given the image with the BLUE values between 0 to 255:
+         *
+         *          200 198 0
+         *          100 15  10
+         *           99 12  5
+         *
+         * We want to encode the letter L which is 76 in ASCII
+         * this yields 01001100 in binary.
+         *
+         * We are going to encode each odd bit starting from the top left
+         * and working our way to the right, and then down the rows
+         * i.e. 198 ->  100 ->  10 ->  12 -> .... (counting from 0)
+         *
+         *
+         * First we write our picture's pixels in binary format:
+         *
+         *        11001000  [11000110]  00000000
+         *       [01100100]  00001111  [00001010]
+         *        01100011  [00001100]  00000101
+         *
+         * Now we are going to encrypt our message bit by bit:
+         *
+         *                   [0]1001100
+         *
+         * First bit in the message is [0] and the first odd pixel is
+         * 11000110 we replace the LSB of the pixel this yields the
+         * 1100011[0] pixel with encoded bit in the brackets
+         *
+         * replacing the second odd pixel [01100100] in the 
+         * message 0[1]001100 yields the second pixel 1[1]000110 to become:
+         * 0110010[1], and so on, until we get the image:
+         *
+         *        11001000  1100011[0]  00000000
+         *       0110010[1]  00001111  0000101[0]
+         *        01100011  0000110[0]  00000101
+         ***********************************************/
+        static void LSB_encode_odd(const std::string name, const std::string message);
 
 
-        static std::string LSB_decode_odd(std::string name);
+        /************************************************
+         * Decodes the message from the image which name is passed to 
+         * the function using the LSB odd method.
+         * This is the opposite of LSB_encode_odd, and the message encoded 
+         * with LSB_encode_odd can be retrieved using this LSB_decode_odd method.
+         *
+         * The message is retrieved from the image and returned as a string.
+         * 
+         * If random image is passed the are no checks done whether the
+         * encoding was used, and therefore it is impossible to determine
+         * if the LSB method was used or not.
+         *         
+         ***********************************************/
+        static std::string LSB_decode_odd(const std::string name);
 
 
-        static void LSB_encode_even(std::string name, std::string message);
+        /************************************************
+         * Encodes the message into the image which name is passed to 
+         * the function using the LSB method with each bit encoded in
+         * every even location of the image provided where every even
+         * pixel in the image is modified and it's least 
+         * significant bit is replaced with the the one of the given 
+         * message which has to be hidden. Then it replaces the actual
+         * image with the new stego image with the message hidden in it.
+         *
+         * Image to encode has to be of the "png" file format, and
+         * all the data is at the moment hidden in the BLUE pixels
+         * as it is the least sensitive to the human eye.
+         *
+         * First of all the length of the message is encoded into first
+         * 64 even pixels of the image, this provides the max message 
+         * size of 2^64 which is very unlikely to be exceeded (heh).
+         *
+         * At the moment image has to be of at least 64x64 size.
+         * 
+         **************************************************
+         *
+         * The example of the possible encoding:
+         * Given the image with the BLUE values between 0 to 255:
+         *
+         *          200 198 0
+         *          100 15  10
+         *           99 12  5
+         *
+         * We want to encode the letter L which is 76 in ASCII
+         * this yields 01001100 in binary.
+         *
+         * We are going to encode each even bit starting from the top left
+         * and working our way to the right, and then down the rows
+         * i.e. 200 -> 0 -> 15 -> 99 -> 5 -> .... (counting from 0)
+         *
+         * First we write our picture's pixels in binary format:
+         *
+         *       [11001000]  11000110  [00000000]
+         *        01100100  [00001111]  00001010
+         *       [01100011]  00001100  [00000101]
+         *
+         * Now we are going to encrypt our message bit by bit:
+         *
+         *                   [0]1001100
+         *
+         * First bit in the message is [0] and the first even pixel is
+         * 11001000 we replace the LSB of the pixel this yields the
+         * 1100100[0] pixel with encoded bit in the brackets
+         *
+         * replacing the second even pixel [00000000] in the 
+         * message 0[1]001100 yields the second pixel 0000000[0] to become:
+         * 00000000[1], and so on, until we get the image:
+         *
+         *       1100100[0]  11000110  0000000[1]
+         *        01100100  0000111[0]  00001010
+         *       0110001[0]  00001100  0000010[1]
+         ***********************************************/
+        static void LSB_encode_even(const std::string name, const std::string message);
 
 
-        static std::string LSB_decode_even(std::string name);
+        /************************************************
+         * Decodes the message from the image which name is passed to 
+         * the function using the LSB odd method.
+         * This is the opposite of LSB_encode_even, and the message encoded 
+         * with LSB_encode_even can be retrieved using this LSB_decode_even method.
+         *
+         * The message is retrieved from the image and returned as a string.
+         * 
+         * If random image is passed the are no checks done whether the
+         * encoding was used, and therefore it is impossible to determine
+         * if the LSB method was used or not.
+         *         
+         ***********************************************/
+        static std::string LSB_decode_even(const std::string name);
 
 
         static void LSB_encode_prime(std::string name, std::string message);
