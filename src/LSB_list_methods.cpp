@@ -40,28 +40,30 @@ namespace steg {
 
     std::vector<int64_t> compute_spiral_matrix(int64_t size);
 
-   void encode_length_generic(const uint64_t msg_length,
-                              CImg<unsigned char> &image,
-                              const std::vector<int64_t> &list);
+    std::vector<int64_t> compute_magic_sq_matrix(int64_t size);
+
+    void encode_length_generic(const uint64_t msg_length,
+                               CImg<unsigned char> &image,
+                               const std::vector<int64_t> &list);
 
     uint64_t decode_length_generic(CImg<unsigned char> &image,
-                               const std::vector<int64_t> &list) ;
+                                   const std::vector<int64_t> &list);
 
     int64_t encode_single_byte(uint8_t to_encode,
-            CImg<unsigned char> &image,
-            int64_t elem,
-            const std::vector<int64_t> &list) ;
+                               CImg<unsigned char> &image,
+                               int64_t elem,
+                               const std::vector<int64_t> &list);
 
-     char decode_single_byte(CImg<unsigned char> &image,
-                                    int64_t elem, const std::vector<int64_t> &list);
+    char decode_single_byte(CImg<unsigned char> &image,
+                            int64_t elem, const std::vector<int64_t> &list);
 
-    static void encode_list_generic(std::string name, 
-        std::string message,
-        const std::function<std::vector<int64_t>(int64_t)>& f);
+    static void encode_list_generic(std::string name,
+                                    std::string message,
+                                    const std::function<std::vector<int64_t>(int64_t)> &f);
 
 
     static std::string decode_list_generic(std::string name,
-        const std::function<std::vector<int64_t>(int64_t)>& f);
+                                           const std::function<std::vector<int64_t>(int64_t)> &f);
 
 
     //*****************************************************************
@@ -80,12 +82,20 @@ namespace steg {
         encode_list_generic(name, message, compute_spiral_matrix);
     }
 
-    std::string StegCoding::LSB_decode_spiral(std::string name){
+    std::string StegCoding::LSB_decode_spiral(std::string name) {
         return decode_list_generic(name, compute_spiral_matrix);
     }
 
+    void StegCoding::LSB_encode_magic_sq(std::string name, std::string message) {
+        encode_list_generic(name, message, compute_magic_sq_matrix);
+    }
+
+    std::string StegCoding::LSB_decode_magic_sq(std::string name) {
+        return decode_list_generic(name, compute_magic_sq_matrix);
+    }
+
     static std::string decode_list_generic(std::string name,
-        const std::function<std::vector<int64_t>(int64_t)>& f){
+                                           const std::function<std::vector<int64_t>(int64_t)> &f) {
 
         CImg<unsigned char> src(name.c_str());
         std::string message = "";
@@ -108,9 +118,9 @@ namespace steg {
     }
 
 
-    static void encode_list_generic(std::string name, 
-        std::string message,
-        const std::function<std::vector<int64_t>(int64_t)>& f){
+    static void encode_list_generic(std::string name,
+                                    std::string message,
+                                    const std::function<std::vector<int64_t>(int64_t)> &f) {
 
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
@@ -134,8 +144,8 @@ namespace steg {
 
 
     void encode_length_generic(const uint64_t msg_length,
-                              CImg<unsigned char> &image,
-                              const std::vector<int64_t> &list) {
+                               CImg<unsigned char> &image,
+                               const std::vector<int64_t> &list) {
 
         int bit, w, h, elem;
         int width = image.width();
@@ -155,9 +165,9 @@ namespace steg {
     }
 
     int64_t encode_single_byte(uint8_t to_encode,
-            CImg<unsigned char> &image,
-            int64_t elem,
-            const std::vector<int64_t> &list) {
+                               CImg<unsigned char> &image,
+                               int64_t elem,
+                               const std::vector<int64_t> &list) {
 
         int shift_count = BIT_TO_BYTE - 1;
         int bit, i, w, h, pos;
@@ -175,7 +185,7 @@ namespace steg {
     }
 
     char decode_single_byte(CImg<unsigned char> &image,
-                                    int64_t elem, const std::vector<int64_t> &list) {
+                            int64_t elem, const std::vector<int64_t> &list) {
         int bit = 0, w, h, pos;
         int width = image.width();
         uint8_t to_decode = 0;
@@ -194,7 +204,7 @@ namespace steg {
 
 
     uint64_t decode_length_generic(CImg<unsigned char> &image,
-                               const std::vector<int64_t> &list) {
+                                   const std::vector<int64_t> &list) {
 
         uint64_t msg_length = 0;
         int width = image.width();
@@ -271,7 +281,6 @@ namespace steg {
     }
 
 
-
     /*****************************************************************
      *
      *                     SPIRAL MATRIX SECTION
@@ -292,7 +301,7 @@ namespace steg {
         int counter;
     };
 
-    void compute_spiral_line(params& par, int **matrix);
+    void compute_spiral_line(params &par, int **matrix);
 
     // computing a sprial matrix, and then collecting the
     // matrix values into the vector for a further use.
@@ -311,88 +320,133 @@ namespace steg {
     // 2 10 26 17 5 1 9 25 19 7 23 20 22 21 (pattern of collecting 
     // the elements can be seen from the example)
     //
-    std::vector<int64_t> compute_spiral_matrix(int64_t size){
+    std::vector<int64_t> compute_spiral_matrix(int64_t size) {
         const int sz = sqrt(size);
 
         // alloc
-        int **matrix = new int*[sz];
-        for(int i = 0; i< sz; i++)
+        int **matrix = new int *[sz];
+        for (int i = 0; i < sz; i++)
             matrix[i] = new int[sz];
 
-        std::vector<int64_t> list {};
-        int x = sz >> 1, y= sz >> 1 ;
+        std::vector<int64_t> list{};
+        int x = sz >> 1, y = sz >> 1;
 
         int inc = 0;
         int steps = 1;
-        params par {direction::RIGHT, std::make_pair(x,y), steps, 0};
+        params par{direction::RIGHT, std::make_pair(x, y), steps, 0};
 
-        while(x >= 0 && y >= 0 && x < sz && y < sz){
+        while (x >= 0 && y >= 0 && x < sz && y < sz) {
             compute_spiral_line(par, matrix);
-            if(++inc == 2){
+            if (++inc == 2) {
                 inc = 0;
                 steps++;
             }
             par.steps = steps;
             x = par.coord.first;
             y = par.coord.second;
-        } 
+        }
 
         int row, temp;
-        for(int r = sz-1; r>-sz ; --r){
+        for (int r = sz - 1; r > -sz; --r) {
             temp = abs(r);
             row = (temp != r) ? 0 : r; //abs(r); // should be 0
 
-            for(int c = temp - row; c<sz-row ; ++c)
-            {
-                list.push_back(matrix[r+c][c]);
+            for (int c = temp - row; c < sz - row; ++c) {
+                list.push_back(matrix[r + c][c]);
             }
         }
 
         // dealloc
-        for(int i = 0; i < sz; i++) {
-            delete [] matrix[i];
+        for (int i = 0; i < sz; i++) {
+            delete[] matrix[i];
         }
-        delete [] matrix;
+        delete[] matrix;
 
         return list;
     }
 
 
-
-    void compute_spiral_line(params& par, int **matrix)
-    {
+    void compute_spiral_line(params &par, int **matrix) {
         int steps = par.steps;
         int counter = par.counter;
         int x = par.coord.first, y = par.coord.second;
-        int x_inc=0, y_inc=0;
+        int x_inc = 0, y_inc = 0;
 
-        switch(par.dir){
+        switch (par.dir) {
             case RIGHT:
-                x_inc=1;
+                x_inc = 1;
                 par.dir = direction::DOWN;
                 break;
             case DOWN:
-                y_inc=1;
+                y_inc = 1;
                 par.dir = direction::LEFT;
                 break;
             case LEFT:
-                x_inc=-1;
+                x_inc = -1;
                 par.dir = direction::UP;
                 break;
             case UP:
-                y_inc=-1;
+                y_inc = -1;
                 par.dir = direction::RIGHT;
                 break;
         }
 
-        while(steps--){
+        while (steps--) {
             matrix[x][y] = counter++;
-            x+=x_inc;
-            y+=y_inc;
-        } 
+            x += x_inc;
+            y += y_inc;
+        }
 
         par.counter = counter;
-        par.coord.first = x ;//- x_inc;
-        par.coord.second = y ;//- y_inc;
+        par.coord.first = x;
+        par.coord.second = y;
+    }
+
+
+    /*****************************************************************
+    *
+    *                     MAGIC SQUARE SECTION
+    *
+    *****************************************************************/
+
+
+
+    // computing the magic square matrix by using the algorithm
+    // from https://introcs.cs.princeton.edu/java/14array/MagicSquare.java.html
+    // more about the algorithm can be found in
+    // https://en.wikipedia.org/wiki/Magic_square
+    std::vector<int64_t> compute_magic_sq_matrix(int64_t size) {
+
+        int n = sqrt(size) + 1;
+        n = (n % 2 == 0) ? n + 1 : n;
+        std::vector<int64_t> list{};
+
+        // A function to generate odd sized magic squares
+        int magic[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                magic[i][j] = 0;
+
+        int row = n - 1;
+        int col = n / 2;
+        magic[row][col] = 0;
+
+        for (int i = 2; i <= n * n; i++) {
+            if (magic[(row + 1) % n][(col + 1) % n] == 0) {
+                row = (row + 1) % n;
+                col = (col + 1) % n;
+            } else {
+                row = (row - 1 + n) % n;
+            }
+            magic[row][col] = i;
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                list.push_back(magic[i][j]);
+            }
+        }
+
+        return list;
     }
 }

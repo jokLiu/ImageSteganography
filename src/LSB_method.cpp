@@ -36,18 +36,18 @@ namespace steg {
 
 
     static char LSB_decode_single_byte(CImg<unsigned char> &image,
-                                std::pair<int, int> &coord) ;
+                                       std::pair<int, int> &coord);
 
     static uint64_t LSB_decode_length(CImg<unsigned char> &image);
 
     static void LSB_enocde_length(const uint64_t msg_length,
-                           CImg<unsigned char> &image);
+                                  CImg<unsigned char> &image);
 
     static std::pair<int, int> LSB_encode_single_byte(uint8_t to_encode,
-                                               CImg<unsigned char> &image,
-                                               std::pair<int, int> &coord);
+                                                      CImg<unsigned char> &image,
+                                                      std::pair<int, int> &coord);
 
-    void StegCoding::LSB_encode(const std::string& name, const std::string& message) {
+    void StegCoding::LSB_encode(const std::string &name, const std::string &message) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
@@ -67,35 +67,35 @@ namespace steg {
         src.save(name.c_str());
     }
 
-    std::string StegCoding::LSB_decode(const std::string& name){
+    std::string StegCoding::LSB_decode(const std::string &name) {
         CImg<unsigned char> src(name.c_str());
         std::string message = "";
         uint64_t msg_length = 0;
 
         // decode length and translate it to bits
-        msg_length = LSB_decode_length(src) * BIT_TO_BYTE 
-                                            + ENCODE_SIZE; 
+        msg_length = LSB_decode_length(src) * BIT_TO_BYTE
+                     + ENCODE_SIZE;
 
         // decode message
         int width = src.width();
         int total_pixels = width * src.height();
         // coordinates to pass into the decode single byte
         auto coord = std::make_pair(ENCODE_SIZE, 0);
-        for (int nr = ENCODE_SIZE; nr < total_pixels && nr < msg_length; 
-                nr += BIT_TO_BYTE) {
+        for (int nr = ENCODE_SIZE; nr < total_pixels && nr < msg_length;
+             nr += BIT_TO_BYTE) {
             // determine the the pixel coordinates
             coord.first = nr % width; // width
             coord.second = nr / width; //height
             message += LSB_decode_single_byte(src, coord);
-            
+
         }
         return message;
     }
 
     static char LSB_decode_single_byte(CImg<unsigned char> &image,
-                                std::pair<int, int> &coord) {
+                                       std::pair<int, int> &coord) {
         // bit to be retrieved from a single pixel
-        int bit = 0; 
+        int bit = 0;
         // single byte to decode
         uint8_t to_decode = 0;
         // width pixel
@@ -131,13 +131,13 @@ namespace steg {
 
 
     static void LSB_enocde_length(const uint64_t msg_length,
-                           CImg<unsigned char> &image) {
+                                  CImg<unsigned char> &image) {
 
         int bit;
         // encoding the size to the picture
         for (int i = ENCODE_SIZE - 1, j = 0; i >= 0; i--, j++) {
             // get the bit at the position
-            bit = (msg_length >> j) & 1U; 
+            bit = (msg_length >> j) & 1U;
 
             // changing blue value of the message
             image(i, 0, BLUE) ^= (-bit ^ image(i, 0, BLUE)) & 1U;
@@ -145,8 +145,8 @@ namespace steg {
     }
 
     static std::pair<int, int> LSB_encode_single_byte(uint8_t to_encode,
-                                               CImg<unsigned char> &image,
-                                               std::pair<int, int> &coord) {
+                                                      CImg<unsigned char> &image,
+                                                      std::pair<int, int> &coord) {
         int shift_count = BIT_TO_BYTE - 1;
         int bit;
         int w = coord.first;

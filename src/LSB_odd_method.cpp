@@ -40,22 +40,22 @@ namespace steg {
         int h;
     };
 
-   static std::pair<int, int> LSB_encode_length_odd_even(uint64_t msg_length,
-                                                   CImg<unsigned char> &image, 
-                                                   const Args args);
+    static std::pair<int, int> LSB_encode_length_odd_even(uint64_t msg_length,
+                                                          CImg<unsigned char> &image,
+                                                          const Args args);
 
-   static uint64_t LSB_decode_length_odd_even(const CImg<unsigned char> &image,
-                                        const Args args);
+    static uint64_t LSB_decode_length_odd_even(const CImg<unsigned char> &image,
+                                               const Args args);
 
-   static std::pair<int, int> LSB_encode_single_byte_odd(uint8_t to_encode,
-            CImg<unsigned char> &image,
-            std::pair<int, int> &coord);
+    static std::pair<int, int> LSB_encode_single_byte_odd(uint8_t to_encode,
+                                                          CImg<unsigned char> &image,
+                                                          std::pair<int, int> &coord);
 
-   static char LSB_decode_single_byte_odd(const CImg<unsigned char> &image,
-                                    const std::pair<int, int> &coord) ;
+    static char LSB_decode_single_byte_odd(const CImg<unsigned char> &image,
+                                           const std::pair<int, int> &coord);
 
-    void StegCoding::LSB_encode_odd(const std::string name, 
-      const std::string message) {
+    void StegCoding::LSB_encode_odd(const std::string name,
+                                    const std::string message) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
@@ -74,7 +74,7 @@ namespace steg {
     }
 
 
-     std::string StegCoding::LSB_decode_odd(const std::string name) {
+    std::string StegCoding::LSB_decode_odd(const std::string name) {
         CImg<unsigned char> src(name.c_str());
         std::string message = "";
         uint64_t msg_length = 0;
@@ -89,16 +89,16 @@ namespace steg {
 
         auto coord = std::make_pair(ENCODE_SIZE, 0);
         for (int nr = 1 + ENCODE_SIZE * 2; nr < total_pixels && nr < msg_length;
-               nr += BIT_TO_BYTE * 2) {
+             nr += BIT_TO_BYTE * 2) {
             coord.first = nr % width; // width
             coord.second = nr / width; //height
-            message += LSB_decode_single_byte_odd(src, coord);    
+            message += LSB_decode_single_byte_odd(src, coord);
         }
 
         return message;
     }
 
-     void StegCoding::LSB_encode_even(const std::string name, const std::string message) {
+    void StegCoding::LSB_encode_even(const std::string name, const std::string message) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
@@ -139,8 +139,8 @@ namespace steg {
     }
 
     static std::pair<int, int> LSB_encode_length_odd_even(uint64_t msg_length,
-                                                   CImg<unsigned char> &image, 
-                                                   const Args args) {
+                                                          CImg<unsigned char> &image,
+                                                          const Args args) {
 
         int bit, w, h, i, j;
         int width = image.width();
@@ -162,7 +162,7 @@ namespace steg {
     }
 
     static uint64_t LSB_decode_length_odd_even(const CImg<unsigned char> &image,
-                                        const Args args) {
+                                               const Args args) {
         uint64_t msg_length = 0;
         int width = image.width();
         int total = image.height() * width;
@@ -206,7 +206,7 @@ namespace steg {
     }
 
     static char LSB_decode_single_byte_odd(const CImg<unsigned char> &image,
-                                    const std::pair<int, int> &coord) {
+                                           const std::pair<int, int> &coord) {
         int bit = 0;
         uint8_t to_decode = 0;
         int w = coord.first;
@@ -222,7 +222,5 @@ namespace steg {
         return to_decode;
     }
 
-   
-   
 
 }

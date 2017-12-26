@@ -41,7 +41,7 @@ namespace steg {
     static int find_min_location(const CImg<unsigned char> &image, int height);
 
     static std::string generic_min_max_decode(std::string name,
-                                              const std::function<int(const CImg<unsigned char> &, int)> &f) ;
+                                              const std::function<int(const CImg<unsigned char> &, int)> &f);
 
     static void generic_min_max_encode(std::string name,
                                        std::string message,
@@ -55,9 +55,9 @@ namespace steg {
                            const std::function<int(const CImg<unsigned char> &, int)> &f);
 
     void encode_single_byte(uint8_t to_encode,
-            CImg<unsigned char> &image,
-            const std::function<int(const CImg<unsigned char> &, int)> &f,
-            int64_t height);
+                            CImg<unsigned char> &image,
+                            const std::function<int(const CImg<unsigned char> &, int)> &f,
+                            int64_t height);
 
     char decode_single_byte(const CImg<unsigned char> &image,
                             const std::function<int(const CImg<unsigned char> &, int)> &f,
@@ -84,9 +84,9 @@ namespace steg {
     }
 
     void encode_single_byte(uint8_t to_encode,
-            CImg<unsigned char> &image,
-            const std::function<int(const CImg<unsigned char> &, int)> &f,
-            int64_t height) {
+                            CImg<unsigned char> &image,
+                            const std::function<int(const CImg<unsigned char> &, int)> &f,
+                            int64_t height) {
 
         int bit, w;
         int h2 = image.height();
