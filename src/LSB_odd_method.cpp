@@ -54,8 +54,8 @@ namespace steg {
     static char LSB_decode_single_byte_odd(const CImg<unsigned char> &image,
                                            const std::pair<int, int> &coord);
 
-    void StegCoding::LSB_encode_odd(const std::string name,
-                                    const std::string message) {
+    void StegCoding::LSB_encode_odd(const std::string& name,
+                                    const std::string& message) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
@@ -74,7 +74,7 @@ namespace steg {
     }
 
 
-    std::string StegCoding::LSB_decode_odd(const std::string name) {
+    std::string StegCoding::LSB_decode_odd(const std::string& name) {
         CImg<unsigned char> src(name.c_str());
         std::string message = "";
         uint64_t msg_length = 0;
@@ -98,7 +98,7 @@ namespace steg {
         return message;
     }
 
-    void StegCoding::LSB_encode_even(const std::string name, const std::string message) {
+    void StegCoding::LSB_encode_even(const std::string& name, const std::string& message) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
@@ -116,7 +116,7 @@ namespace steg {
         src.save(name.c_str());
     }
 
-    std::string StegCoding::LSB_decode_even(const std::string name) {
+    std::string StegCoding::LSB_decode_even(const std::string& name) {
         CImg<unsigned char> src(name.c_str());
         std::string message = "";
         uint64_t msg_length = 0;

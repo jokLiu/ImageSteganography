@@ -64,22 +64,22 @@ namespace steg {
                             int64_t height);
 
 
-    void StegCoding::LSB_encode_max(const std::string name, const std::string message) {
+    void StegCoding::LSB_encode_max(const std::string& name, const std::string& message) {
         generic_min_max_encode(name, message, find_max_location);
     }
 
 
-    std::string StegCoding::LSB_decode_max(const std::string name) {
+    std::string StegCoding::LSB_decode_max(const std::string& name) {
         return generic_min_max_decode(name, find_max_location);
     }
 
 
-    void StegCoding::LSB_encode_min(const std::string name, const std::string message) {
+    void StegCoding::LSB_encode_min(const std::string& name, const std::string& message) {
         generic_min_max_encode(name, message, find_min_location);
     }
 
 
-    std::string StegCoding::LSB_decode_min(std::string name) {
+    std::string StegCoding::LSB_decode_min(const std::string& name) {
         return generic_min_max_decode(name, find_min_location);
     }
 

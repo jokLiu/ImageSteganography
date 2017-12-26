@@ -171,7 +171,7 @@ namespace steg {
          *       0110010[1]  00001111  0000101[0]
          *        01100011  0000110[0]  00000101
          ***********************************************/
-        static void LSB_encode_odd(const std::string name, const std::string message);
+        static void LSB_encode_odd(const std::string& name, const std::string& message);
 
 
         /************************************************
@@ -187,7 +187,7 @@ namespace steg {
          * if the LSB method was used or not.
          *         
          ***********************************************/
-        static std::string LSB_decode_odd(const std::string name);
+        static std::string LSB_decode_odd(const std::string& name);
 
 
         /************************************************
@@ -247,7 +247,7 @@ namespace steg {
          *        01100100  0000111[0]  00001010
          *       0110001[0]  00001100  0000010[1]
          ***********************************************/
-        static void LSB_encode_even(const std::string name, const std::string message);
+        static void LSB_encode_even(const std::string& name, const std::string& message);
 
 
         /************************************************
@@ -263,7 +263,7 @@ namespace steg {
          * if the LSB method was used or not.
          *         
          ***********************************************/
-        static std::string LSB_decode_even(const std::string name);
+        static std::string LSB_decode_even(const std::string& name);
 
         /************************************************
         * Encodes the message into the image which name is passed to
@@ -325,7 +325,7 @@ namespace steg {
         *       01100100  00001111    0000101[1]
         *       01100011  0000110[0]  00000101
         ***********************************************/
-        static void LSB_encode_max(const std::string name, const std::string message);
+        static void LSB_encode_max(const std::string& name, const std::string& message);
 
 
         /************************************************
@@ -341,7 +341,7 @@ namespace steg {
          * if the LSB_max method was used or not.
          *         
          ***********************************************/
-        static std::string LSB_decode_max(const std::string name);
+        static std::string LSB_decode_max(const std::string& name);
 
         /************************************************
          * Encodes the message into the image which name is passed to 
@@ -403,7 +403,7 @@ namespace steg {
          *       0110010[1]  00001111  00001010
          *       01100011    00001100  0000010[0]
          ***********************************************/
-        static void LSB_encode_min(const std::string name, const std::string message);
+        static void LSB_encode_min(const std::string& name, const std::string& message);
 
         /************************************************
          * Decodes the message from the image which name is passed to 
@@ -418,7 +418,7 @@ namespace steg {
          * if the LSB_min method was used or not.
          *         
          ***********************************************/
-        static std::string LSB_decode_min(std::string name);
+        static std::string LSB_decode_min(const std::string& name);
 
         /************************************************
         * Encodes the message into the image which name is passed to
@@ -478,7 +478,7 @@ namespace steg {
         *
         * location 2, 3, 5, 7 were encoded (starting from 0)
         ***********************************************/
-        static void LSB_encode_prime(std::string name, std::string message);
+        static void LSB_encode_prime(const std::string& name, const std::string& message);
 
 
         /************************************************
@@ -494,7 +494,7 @@ namespace steg {
          * if the LSB_prime method was used or not.
          *         
          ***********************************************/
-        static std::string LSB_decode_prime(std::string name);
+        static std::string LSB_decode_prime(const std::string& name);
 
         /************************************************
         * Encodes the message into the image which name is passed to
@@ -567,7 +567,7 @@ namespace steg {
         *       01100011    0000110[0]  0000010[1]
         *
         ***********************************************/
-        static void LSB_encode_spiral(std::string name, std::string message);
+        static void LSB_encode_spiral(const std::string& name, const std::string& message);
 
         /************************************************
          * Decodes the message from the image which name is passed to 
@@ -582,7 +582,7 @@ namespace steg {
          * if the LSB_spiral method was used or not.
          *         
          ***********************************************/
-        static std::string LSB_decode_spiral(std::string name);
+        static std::string LSB_decode_spiral(const std::string& name);
 
 
         /************************************************
@@ -656,7 +656,7 @@ namespace steg {
         *       01100011    0000110[1]  0000010[0]
         *
         ***********************************************/
-        static void LSB_encode_magic_sq(std::string name, std::string message);
+        static void LSB_encode_magic_sq(const std::string& name, const std::string& message);
 
 
         /************************************************
@@ -672,7 +672,7 @@ namespace steg {
          * if the LSB_magic_square method was used or not.
          *         
          ***********************************************/
-        static std::string LSB_decode_magic_sq(std::string name);
+        static std::string LSB_decode_magic_sq(const std::string& name);
 
 
     };

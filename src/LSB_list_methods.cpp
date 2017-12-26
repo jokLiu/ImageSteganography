@@ -70,27 +70,27 @@ namespace steg {
     //*****************************************************************
     //*****************************************************************
 
-    void StegCoding::LSB_encode_prime(std::string name, std::string message) {
+    void StegCoding::LSB_encode_prime(const std::string& name, const std::string& message) {
         encode_list_generic(name, message, primes);
     }
 
-    std::string StegCoding::LSB_decode_prime(std::string name) {
+    std::string StegCoding::LSB_decode_prime(const std::string& name) {
         return decode_list_generic(name, primes);
     }
 
-    void StegCoding::LSB_encode_spiral(std::string name, std::string message) {
+    void StegCoding::LSB_encode_spiral(const std::string& name, const std::string& message) {
         encode_list_generic(name, message, compute_spiral_matrix);
     }
 
-    std::string StegCoding::LSB_decode_spiral(std::string name) {
+    std::string StegCoding::LSB_decode_spiral(const std::string& name) {
         return decode_list_generic(name, compute_spiral_matrix);
     }
 
-    void StegCoding::LSB_encode_magic_sq(std::string name, std::string message) {
+    void StegCoding::LSB_encode_magic_sq(const std::string& name, const std::string& message) {
         encode_list_generic(name, message, compute_magic_sq_matrix);
     }
 
-    std::string StegCoding::LSB_decode_magic_sq(std::string name) {
+    std::string StegCoding::LSB_decode_magic_sq(const std::string& name) {
         return decode_list_generic(name, compute_magic_sq_matrix);
     }
 
