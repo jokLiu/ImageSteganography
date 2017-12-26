@@ -252,7 +252,7 @@ namespace steg {
 
         /************************************************
          * Decodes the message from the image which name is passed to 
-         * the function using the LSB odd method.
+         * the function using the LSB even method.
          * This is the opposite of LSB_encode_even, and the message encoded 
          * with LSB_encode_even can be retrieved using this LSB_decode_even method.
          *
@@ -265,23 +265,166 @@ namespace steg {
          ***********************************************/
         static std::string LSB_decode_even(const std::string name);
 
+         /************************************************
+         * Encodes the message into the image which name is passed to 
+         * the function using the LSB max method where the largest pixel in a row
+         * (i.e. the pixel with the largest RED value in each row) in the image
+         * is modified and it's least significant bit is replaced with the the
+         * one of the given message which has to be hidden. 
+         * Then it replaces the actual image with the new stego image 
+         * with the message hidden in it.
+         *
+         * Image to encode has to be of the "png" file format, and
+         * all the data is at the moment hidden in the BLUE pixels
+         * as it is the least sensitive to the human eye.
+         *
+         * First of all the length of the message is encoded into first
+         * 64 rows, this provides the max message size of 2^64 which
+         * is very unlikely to be exceeded (heh).
+         *
+         * At the moment image has to be of at least 64x64 size.
+         *
+         **************************************************
+         *
+         * The example of the possible encoding:
+         * Given the image with the BLUE/RED values between 0 to 255:
+         *
+         *          [200/10] [198/78] [0/101]
+         *          [100/1]  [15/3]   [10/8]
+         *          [99/155] [12/250] [5/71]
+         *
+         * We want to encode the letter L which is 76 in ASCII
+         * this yields 01001100 in binary.
+         *
+         * We are going to encode each bit starting from the top row
+         * and working our way to the bottom
+         * i.e 1. [0/178] ( RED 101 largest out of 10, 78, 101 in the first row)
+         *     2. [10/8] (RED 8 largest out of 1, 3, 8 in the second row)
+         *     3. [12/250] (RED 250 largest out of 155, 250, 71 in the third row)
+         *
+         * First we write our BLUE picture's pixels in binary format:
+         *
+         *       11001000  11000110  00000000
+         *       01100100  00001111  00001010
+         *       01100011  00001100  00000101
+         *
+         * Now we are going to encrypt our message bit by bit:
+         *
+         *                   [0]1001100
+         *
+         * First bit in the message is [0] and the largest RED pixel is [0/101]
+         * therefore BLUE pixel 0 (00000000) will be encoded.
+         * We replace the LSB of the pixel and this yields the
+         * 0000000[0] pixel with encoded bit in the brackets
+         *
+         * replacing the second bit in the message 0[1]001100
+         * yields the largest pixel in row two [10/8] (BLUE 00001010)
+         * to become 0000101[1], and so on, until we get the image:
+         *
+         *       11001000  11000110    0000000[0]
+         *       01100100  00001111    0000101[1]
+         *       01100011  0000110[0]  00000101
+         ***********************************************/
+        static void LSB_encode_max(const std::string name, const std::string message);
+
+
+        /************************************************
+         * Decodes the message from the image which name is passed to 
+         * the function using the LSB max method.
+         * This is the opposite of LSB_encode_max, and the message encoded 
+         * with LSB_encode_max can be retrieved using this LSB_decode_max method.
+         *
+         * The message is retrieved from the image and returned as a string.
+         * 
+         * If random image is passed the are no checks done whether the
+         * encoding was used, and therefore it is impossible to determine
+         * if the LSB_max method was used or not.
+         *         
+         ***********************************************/
+        static std::string LSB_decode_max(const std::string name);
+
+        /************************************************
+         * Encodes the message into the image which name is passed to 
+         * the function using the LSB min method where the smallest pixel in a row
+         * (i.e. the pixel with the smallest RED value in each row) in the image
+         * is modified and it's least significant bit is replaced with the the
+         * one of the given message which has to be hidden. 
+         * Then it replaces the actual image with the new stego image 
+         * with the message hidden in it.
+         *
+         * Image to encode has to be of the "png" file format, and
+         * all the data is at the moment hidden in the BLUE pixels
+         * as it is the least sensitive to the human eye.
+         *
+         * First of all the length of the message is encoded into first
+         * 64 rows, this provides the max message size of 2^64 which
+         * is very unlikely to be exceeded (heh).
+         *
+         * At the moment image has to be of at least 64x64 size.
+         *
+         **************************************************
+         *
+         * The example of the possible encoding:
+         * Given the image with the BLUE/RED values between 0 to 255:
+         *
+         *          [200/10] [198/78] [0/101]
+         *          [100/1]  [15/3]   [10/8]
+         *          [99/155] [12/250] [5/71]
+         *
+         * We want to encode the letter L which is 76 in ASCII
+         * this yields 01001100 in binary.
+         *
+         * We are going to encode each bit starting from the top row
+         * and working our way to the bottom
+         * i.e 1. [200/10] ( RED 10 smallest out of 10, 78, 101 in the first row)
+         *     2. [100/1] (RED 1 largest out of 1, 3, 8 in the second row)
+         *     3. [5/71] (RED 71 largest out of 155, 250, 71 in the third row)
+         *
+         * First we write our BLUE picture's pixels in binary format:
+         *
+         *       11001000  11000110  00000000
+         *       01100100  00001111  00001010
+         *       01100011  00001100  00000101
+         *
+         * Now we are going to encrypt our message bit by bit:
+         *
+         *                   [0]1001100
+         *
+         * First bit in the message is [0] and the smallest RED pixel is [200/10]
+         * therefore BLUE pixel 200 (11001000) will be encoded.
+         * We replace the LSB of the pixel and this yields the
+         * 1100100[0] pixel with encoded bit in the brackets
+         *
+         * replacing the second bit in the message 0[1]001100
+         * yields the smallest pixel in row two [100/1] (BLUE 01100100)
+         * to become 0110010[1], and so on, until we get the image:
+         *
+         *       1100100[0]  11000110  00000000
+         *       0110010[1]  00001111  00001010
+         *       01100011    00001100  0000010[0]
+         ***********************************************/
+        static void LSB_encode_min(const std::string name, const std::string message);
+
+        /************************************************
+         * Decodes the message from the image which name is passed to 
+         * the function using the LSB min method.
+         * This is the opposite of LSB_encode_min, and the message encoded 
+         * with LSB_encode_min can be retrieved using this LSB_decode_max method.
+         *
+         * The message is retrieved from the image and returned as a string.
+         * 
+         * If random image is passed the are no checks done whether the
+         * encoding was used, and therefore it is impossible to determine
+         * if the LSB_min method was used or not.
+         *         
+         ***********************************************/
+        static std::string LSB_decode_min(std::string name);
+
 
         static void LSB_encode_prime(std::string name, std::string message);
 
 
         static std::string LSB_decode_prime(std::string name);
-
-
-        static void LSB_encode_max(std::string name, std::string message);
-
-
-        static std::string LSB_decode_max(std::string name);
-
-        
-        static void LSB_encode_min(std::string name, std::string message);
-
-
-        static std::string LSB_decode_min(std::string name);
 
 
         static void LSB_encode_spiral(std::string name, std::string message);

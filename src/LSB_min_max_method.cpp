@@ -1,6 +1,27 @@
+//===----------------------------------------------------------------------===//
 //
-// Created by jokubas on 12/12/17.
+//                           The MIT License (MIT)
+//                    Copyright (c) 2017 Jokubas Liutkus
 //
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//===----------------------------------------------------------------------===//
+
 #include <string>
 #include <assert.h>
 #include <iostream>
@@ -15,39 +36,56 @@ using namespace cimg_library;
 
 namespace steg {
 
-    static int find_max_location(CImg<unsigned char> &image, int height);
+    static int find_max_location(const CImg<unsigned char> &image, int height);
 
-    static int find_min_location(CImg<unsigned char> &image, int height);
+    static int find_min_location(const CImg<unsigned char> &image, int height);
 
     static std::string generic_min_max_decode(std::string name,
-                                              const std::function<int(CImg<unsigned char> &, int)> &f);
+                                              const std::function<int(const CImg<unsigned char> &, int)> &f) ;
 
     static void generic_min_max_encode(std::string name,
                                        std::string message,
-                                       const std::function<int(CImg<unsigned char> &, int)> &f);
+                                       const std::function<int(const CImg<unsigned char> &, int)> &f);
 
     void encode_length(uint64_t msg_length,
                        CImg<unsigned char> &image,
-                       const std::function<int(CImg<unsigned char> &, int)> &f);
+                       const std::function<int(const CImg<unsigned char> &, int)> &f);
 
-    uint64_t decode_length(CImg<unsigned char> &image,
-                           const std::function<int(CImg<unsigned char> &, int)> &f);
+    uint64_t decode_length(const CImg<unsigned char> &image,
+                           const std::function<int(const CImg<unsigned char> &, int)> &f);
 
-    void encode_single_byte(
-            uint8_t to_encode,
+    void encode_single_byte(uint8_t to_encode,
             CImg<unsigned char> &image,
-            const std::function<int(CImg<unsigned char> &, int)> &f,
+            const std::function<int(const CImg<unsigned char> &, int)> &f,
             int64_t height);
 
-    char decode_single_byte(CImg<unsigned char> &image,
-                            const std::function<int(CImg<unsigned char> &, int)> &f,
+    char decode_single_byte(const CImg<unsigned char> &image,
+                            const std::function<int(const CImg<unsigned char> &, int)> &f,
                             int64_t height);
 
 
-    void encode_single_byte(
-            uint8_t to_encode,
+    void StegCoding::LSB_encode_max(const std::string name, const std::string message) {
+        generic_min_max_encode(name, message, find_max_location);
+    }
+
+
+    std::string StegCoding::LSB_decode_max(const std::string name) {
+        return generic_min_max_decode(name, find_max_location);
+    }
+
+
+    void StegCoding::LSB_encode_min(const std::string name, const std::string message) {
+        generic_min_max_encode(name, message, find_min_location);
+    }
+
+
+    std::string StegCoding::LSB_decode_min(std::string name) {
+        return generic_min_max_decode(name, find_min_location);
+    }
+
+    void encode_single_byte(uint8_t to_encode,
             CImg<unsigned char> &image,
-            const std::function<int(CImg<unsigned char> &, int)> &f,
+            const std::function<int(const CImg<unsigned char> &, int)> &f,
             int64_t height) {
 
         int bit, w;
@@ -63,8 +101,8 @@ namespace steg {
         }
     }
 
-    char decode_single_byte(CImg<unsigned char> &image,
-                            const std::function<int(CImg<unsigned char> &, int)> &f,
+    char decode_single_byte(const CImg<unsigned char> &image,
+                            const std::function<int(const CImg<unsigned char> &, int)> &f,
                             int64_t height) {
         int bit = 0, w;
         uint8_t to_decode = 0;
@@ -82,7 +120,7 @@ namespace steg {
 
     void encode_length(uint64_t msg_length,
                        CImg<unsigned char> &image,
-                       const std::function<int(CImg<unsigned char> &, int)> &f) {
+                       const std::function<int(const CImg<unsigned char> &, int)> &f) {
         int bit, w;
         int height = image.height();
 
@@ -98,8 +136,8 @@ namespace steg {
     }
 
 
-    uint64_t decode_length(CImg<unsigned char> &image,
-                           const std::function<int(CImg<unsigned char> &, int)> &f) {
+    uint64_t decode_length(const CImg<unsigned char> &image,
+                           const std::function<int(const CImg<unsigned char> &, int)> &f) {
         uint64_t msg_length = 0;
         int bit, w;
 
@@ -115,7 +153,7 @@ namespace steg {
     }
 
 
-    static int find_max_location(CImg<unsigned char> &image, int height) {
+    static int find_max_location(const CImg<unsigned char> &image, int height) {
         int max_loc = 0, max_colour = INT_MIN;
         for (int w = 0; w < image.width(); w++) {
             if (image(w, height, RED) > max_colour) {
@@ -126,7 +164,7 @@ namespace steg {
         return max_loc;
     }
 
-    static int find_min_location(CImg<unsigned char> &image, int height) {
+    static int find_min_location(const CImg<unsigned char> &image, int height) {
         int min_loc = 0, min_colour = INT_MAX;
         for (int w = 0; w < image.width(); w++) {
             if (image(w, height, RED) > min_colour) {
@@ -137,28 +175,8 @@ namespace steg {
         return min_loc;
     }
 
-
-    void StegCoding::LSB_encode_max(std::string name, std::string message) {
-        generic_min_max_encode(name, message, find_max_location);
-    }
-
-
-    std::string StegCoding::LSB_decode_max(std::string name) {
-        return generic_min_max_decode(name, find_max_location);
-    }
-
-
-    void StegCoding::LSB_encode_min(std::string name, std::string message) {
-        generic_min_max_encode(name, message, find_min_location);
-    }
-
-
-    std::string StegCoding::LSB_decode_min(std::string name) {
-        return generic_min_max_decode(name, find_min_location);
-    }
-
     static std::string generic_min_max_decode(std::string name,
-                                              const std::function<int(CImg<unsigned char> &, int)> &f) {
+                                              const std::function<int(const CImg<unsigned char> &, int)> &f) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = decode_length(src, f);
         msg_length += ENCODE_SIZE;
@@ -173,11 +191,10 @@ namespace steg {
 
     static void generic_min_max_encode(std::string name,
                                        std::string message,
-                                       const std::function<int(CImg<unsigned char> &, int)> &f) {
+                                       const std::function<int(const CImg<unsigned char> &, int)> &f) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
-        // TODO check whether width is enough
         encode_length(msg_length, src, f);
 
         int64_t height = ENCODE_SIZE;

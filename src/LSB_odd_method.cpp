@@ -1,6 +1,27 @@
+//===----------------------------------------------------------------------===//
 //
-// Created by jokubas on 12/12/17.
+//                           The MIT License (MIT)
+//                    Copyright (c) 2017 Jokubas Liutkus
 //
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//===----------------------------------------------------------------------===//
+
 #include <string>
 #include <assert.h>
 #include <iostream>
@@ -26,14 +47,15 @@ namespace steg {
    static uint64_t LSB_decode_length_odd_even(const CImg<unsigned char> &image,
                                         const Args args);
 
-   static std::pair<int, int> LSB_encode_single_byte_odd(
-            uint8_t to_encode,
+   static std::pair<int, int> LSB_encode_single_byte_odd(uint8_t to_encode,
             CImg<unsigned char> &image,
             std::pair<int, int> &coord);
+
    static char LSB_decode_single_byte_odd(const CImg<unsigned char> &image,
                                     const std::pair<int, int> &coord) ;
 
-    void StegCoding::LSB_encode_odd(const std::string name, const std::string message) {
+    void StegCoding::LSB_encode_odd(const std::string name, 
+      const std::string message) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
