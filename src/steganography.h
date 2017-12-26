@@ -420,16 +420,168 @@ namespace steg {
          ***********************************************/
         static std::string LSB_decode_min(std::string name);
 
-
+         /************************************************
+         * Encodes the message into the image which name is passed to 
+         * the function using the LSB prime method where each bit of the message
+         * is encoded into every prime pixel of the image.
+         *
+         * Image to encode has to be of the "png" file format, and
+         * all the data is at the moment hidden in the BLUE pixels
+         * as it is the least sensitive to the human eye.
+         *
+         * First of all the length of the message is encoded into first
+         * 64 locations, this provides the max message size of 2^64 which
+         * is very unlikely to be exceeded (heh).
+         *
+         * At the moment image has to be of at least 64x64 size.
+         *
+         **************************************************
+         *
+         * The example of the possible encoding:
+         * Given the image with the BLUE values between 0 to 255:
+         *
+         *          200 198 0
+         *          100 15  10
+         *           99 12  5
+         *
+         * We want to encode the letter L which is 76 in ASCII
+         * this yields 01001100 in binary.
+         *
+         * We are going to encode each bit in each primary located pixel
+         * starting from top left and working our way to the right and then
+         * down the rows. 
+         *
+         * First primary numbers are 2, 3, 5, 7 ,...
+         *
+         * First we write our BLUE picture's pixels in binary format:
+         *
+         *       11001000  11000110  00000000
+         *       01100100  00001111  00001010
+         *       01100011  00001100  00000101
+         *
+         * Now we are going to encrypt our message bit by bit:
+         *
+         *                   [0]1001100
+         *
+         * First bit in the message is [0] and the first primary number is
+         * 2 therefore pixel 0 (00000000) will be encoded.
+         * We replace the LSB of the pixel and this yields the
+         * 0000000[0] pixel with encoded bit in the brackets
+         *
+         * replacing the second bit in the message 0[1]001100
+         * yields the second prime number located pixel 3 (i.e. 100)
+         * to become  0110010[1], and so on, until we get the image:
+         *
+         *       11001000    11000110  0000000[0]
+         *       0110010[1]  00001111  0000101[0]
+         *       01100011    0000110[0]  00000101
+         *
+         * location 2, 3, 5, 7 were encoded (starting from 0)
+         ***********************************************/
         static void LSB_encode_prime(std::string name, std::string message);
 
 
+        /************************************************
+         * Decodes the message from the image which name is passed to 
+         * the function using the LSB prime method.
+         * This is the opposite of LSB_encode_prime, and the message encoded 
+         * with LSB_encode_prime can be retrieved using this LSB_decode_prime method.
+         *
+         * The message is retrieved from the image and returned as a string.
+         * 
+         * If random image is passed the are no checks done whether the
+         * encoding was used, and therefore it is impossible to determine
+         * if the LSB_prime method was used or not.
+         *         
+         ***********************************************/
         static std::string LSB_decode_prime(std::string name);
 
-
+         /************************************************
+         * Encodes the message into the image which name is passed to 
+         * the function using the LSB spiral matrix method where each 
+         * bit of the message is encoded into every pixel produced by
+         * spiral matrix.
+         *
+         * Image to encode has to be of the "png" file format, and
+         * all the data is at the moment hidden in the BLUE pixels
+         * as it is the least sensitive to the human eye.
+         *
+         * First of all the length of the message is encoded into first
+         * 64 locations, this provides the max message size of 2^64 which
+         * is very unlikely to be exceeded (heh).
+         *
+         * At the moment image has to be of at least 64x64 size.
+         *
+         **************************************************
+         *
+         * The example of the possible encoding:
+         * Given the image with the BLUE values between 0 to 255:
+         *
+         *          200 198 0
+         *          100 15  10
+         *           99 12  5
+         *
+         * We want to encode the letter L which is 76 in ASCII
+         * this yields 01001100 in binary.
+         *
+         * We are going to encode each bit in each primary located pixel
+         * starting from top left and working our way to the right and then
+         * down the rows. 
+         *
+         * First we generate our spiral matrix i.e.
+         *
+         *        4 5 6 
+         *        3 0 7 
+         *        2 1 8 
+         *
+         * and the list collected will be:
+         * 2 3 1 4 0 8 5 7 6 (pattern of collecting 
+         * the elements can be seen from the example)
+         * More about the method can be found in the implementation source file.
+         *
+         * So our first bit will go into location 2, second to 3, 
+         * third into 1 and so on.
+         *
+         *
+         * We write our BLUE picture's pixels in binary format:
+         *
+         *       11001000  11000110  00000000
+         *       01100100  00001111  00001010
+         *       01100011  00001100  00000101
+         *
+         * Now we are going to encrypt our message bit by bit:
+         *
+         *                   [0]1001100
+         *
+         * First bit in the message is [0] and the first location is
+         * 2 therefore pixel 0 (00000000) will be encoded.
+         * We replace the LSB of the pixel and this yields the
+         * 0000000[0] pixel with encoded bit in the brackets
+         *
+         * replacing the second bit in the message 0[1]001100
+         * yields the pixel in location 3 (i.e. 100)
+         * to become  0110010[1], and so on, until we get the image:
+         *
+         *       1100100[1]  1100011[0]  0000000[0]
+         *       0110010[1]  0000111[0]  0000101[0]
+         *       01100011    0000110[0]  0000010[1]
+         *
+         ***********************************************/
         static void LSB_encode_spiral(std::string name, std::string message);
 
-
+        /************************************************
+         * Decodes the message from the image which name is passed to 
+         * the function using the LSB spiral method.
+         * This is the opposite of LSB_encode_spiral, and the message encoded 
+         * with LSB_encode_spiral can be retrieved using this LSB_decode_spiral method.
+         *
+         * The message is retrieved from the image and returned as a string.
+         * 
+         * If random image is passed the are no checks done whether the
+         * encoding was used, and therefore it is impossible to determine
+         * if the LSB_prime method was used or not.
+         *         
+         ***********************************************/
         static std::string LSB_decode_spiral(std::string name);
 
 
