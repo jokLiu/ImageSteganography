@@ -49,7 +49,7 @@ namespace steg {
     uint64_t decode_length_generic(CImg<unsigned char> &image,
                                    const std::vector<int64_t> &list);
 
-    int64_t encode_single_byte(uint8_t to_encode,
+    int64_t encode_single_byte_list(uint8_t to_encode,
                                CImg<unsigned char> &image,
                                int64_t elem,
                                const std::vector<int64_t> &list);
@@ -136,7 +136,7 @@ namespace steg {
         // encoding the message
         int64_t elem = ENCODE_SIZE;
         for (char c : message) {
-            elem = encode_single_byte(c, src, elem, prime_n);
+            elem = encode_single_byte_list(c, src, elem, prime_n);
         }
 
         src.save(name.c_str());
@@ -164,7 +164,7 @@ namespace steg {
         }
     }
 
-    int64_t encode_single_byte(uint8_t to_encode,
+    int64_t encode_single_byte_list(uint8_t to_encode,
                                CImg<unsigned char> &image,
                                int64_t elem,
                                const std::vector<int64_t> &list) {

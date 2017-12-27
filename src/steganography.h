@@ -674,8 +674,12 @@ namespace steg {
          ***********************************************/
         static std::string LSB_decode_magic_sq(const std::string& name);
 
+        static void encode_binary_image(const std::string& name, const std::string& binary_image);
+
+        static void decode_binary_image(const std::string& name, const std::string& binary_image);
 
     };
+
 }
 
 

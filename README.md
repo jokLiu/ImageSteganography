@@ -61,6 +61,10 @@ int main() {
 
   std::cout <<steg::StegCoding::LSB_decode_magic_sq("skull2.png") << "\n";
 
+  steg::StegCoding::encode_binary_image("city.png", "image_to_hide.pbm");
+
+  steg::StegCoding::decode_binary_image("city.png", "hidden_image_to_store.pbm");
+  
   return 0;
 }
 ```
@@ -160,6 +164,33 @@ static void LSB_encode_magic_sq(const std::string& name, const std::string& mess
 static std::string LSB_decode_magic_sq(const std::string& name);
 ```
 
+9. Encodes the binary pbm format image (**binary_image**) into another image provided by the **name**. At the moment simple LSB_encode/decode method is used, but will be possible to choose any method from the above.
+
+```c++
+static void encode_binary_image(const std::string& name, const std::string& binary_image);
+static void decode_binary_image(const std::string& name, const std::string& binary_image);
+```
+
+**Explanation of the binary image encoding**
+
+Imagine you are a secret agent who wants to transfer the nuclear warhead plans (image below) from country A to country B , however, country A can see all the outgoing and incoming traffic, therefore, you pretend to send a beautiful city image to your friend with a nuclear plans hidden inside the image. You can see that there is almost not difference between the stego image (encoded image) and uncoded one. 
+
+(Note: later steg analysis will be implemented to show the differences between encoded images and uncoded ones. Also, we will be able to determine the best performed methods. )
+
+
+
+**Nuclear Rocket image to be hidden**
+
+![Nuclear rockets](/home/jokubas/Desktop/Nuclear rockets.GIF)
+
+**Uncoded image**![city](https://github.com/jokLiu/ImageSteganography/blob/master/examples/images/city_main.png?raw=true)
+
+
+
+**Encoded image**
+
+![city](https://github.com/jokLiu/ImageSteganography/blob/master/examples/images/city.png?raw=true)
+
 ## TODO List
 
 * Fix `LSB_encode_magic_sq ` as some bits are destroyed. (issue: bad magic square implementation).
@@ -168,6 +199,7 @@ static std::string LSB_decode_magic_sq(const std::string& name);
 * Adding warnings/checks to indicate that not all the message was encoded due to the capacity reasons.
 * Creating some examples of possible usages.
 * Parallel image processing.
+* Implementing steg analysis. (possible methods for measurement:   Mean  Square  Error(MSE) , Peak  to  Signal  Noise  Ratio (PSNR), Structural SIMilarity  (SSIM) ).
 
 ## Contributing
 
