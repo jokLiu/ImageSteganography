@@ -209,7 +209,7 @@ Note: Contributing.md will be available soon.
 
 ## License
 
-Open source license currently being reviewed.
+Project is released under the [MIT License](https://jokliu.mit-license.org/).
 
 ## Author
 
