@@ -181,7 +181,7 @@ Imagine you are a secret agent who wants to transfer the nuclear warhead plans (
 
 **Nuclear Rocket image to be hidden**
 
-![Nuclear rockets](/home/jokubas/Desktop/Nuclear rockets.GIF)
+![Nuclear rockets](https://github.com/jokLiu/ImageSteganography/blob/master/examples/images/nuclear.gif?raw=true)
 
 **Uncoded image**![city](https://github.com/jokLiu/ImageSteganography/blob/master/examples/images/city_main.png?raw=true)
 
