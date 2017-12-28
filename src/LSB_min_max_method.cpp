@@ -45,6 +45,7 @@ namespace steg {
 
     static void generic_min_max_encode(std::string name,
                                        std::string message,
+                                       std::string steg_image,
                                        const std::function<int(const CImg<unsigned char> &, int)> &f);
 
     void encode_length(uint64_t msg_length,
@@ -64,22 +65,40 @@ namespace steg {
                             int64_t height);
 
 
-    void StegCoding::LSB_encode_max(const std::string& name, const std::string& message) {
-        generic_min_max_encode(name, message, find_max_location);
+    //*****************************************************************
+    //*****************************************************************
+    //*****************************************************************
+
+
+    void StegCoding::LSB_encode_max(const std::string &name,
+                                    const std::string &message) {
+        generic_min_max_encode(name, message, name, find_max_location);
+    }
+
+    void StegCoding::LSB_encode_max(const std::string &name,
+                                    const std::string &message,
+                                    const std::string &stego_image) {
+        generic_min_max_encode(name, message, stego_image, find_max_location);
     }
 
 
-    std::string StegCoding::LSB_decode_max(const std::string& name) {
+    std::string StegCoding::LSB_decode_max(const std::string &name) {
         return generic_min_max_decode(name, find_max_location);
     }
 
 
-    void StegCoding::LSB_encode_min(const std::string& name, const std::string& message) {
-        generic_min_max_encode(name, message, find_min_location);
+    void StegCoding::LSB_encode_min(const std::string &name,
+                                    const std::string &message) {
+        generic_min_max_encode(name, message, name, find_min_location);
     }
 
+    void StegCoding::LSB_encode_min(const std::string &name,
+                                    const std::string &message,
+                                    const std::string &stego_image) {
+        generic_min_max_encode(name, message, stego_image, find_min_location);
+    }
 
-    std::string StegCoding::LSB_decode_min(const std::string& name) {
+    std::string StegCoding::LSB_decode_min(const std::string &name) {
         return generic_min_max_decode(name, find_min_location);
     }
 
@@ -191,6 +210,7 @@ namespace steg {
 
     static void generic_min_max_encode(std::string name,
                                        std::string message,
+                                       std::string steg_image,
                                        const std::function<int(const CImg<unsigned char> &, int)> &f) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
@@ -203,7 +223,7 @@ namespace steg {
             height += BIT_TO_BYTE;
         }
 
-        src.save(name.c_str());
+        src.save(steg_image.c_str());
     }
 
 }

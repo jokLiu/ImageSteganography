@@ -47,7 +47,20 @@ namespace steg {
                                                       CImg<unsigned char> &image,
                                                       std::pair<int, int> &coord);
 
-    void StegCoding::LSB_encode(const std::string &name, const std::string &message) {
+
+    //*****************************************************************
+    //*****************************************************************
+    //*****************************************************************
+
+
+    void StegCoding::LSB_encode(const std::string &name,
+                                const std::string &message) {
+        LSB_encode(name, message, name);
+    }
+
+    void StegCoding::LSB_encode(const std::string &name,
+                                const std::string &message,
+                                const std::string &stego_image) {
         CImg<unsigned char> src(name.c_str());
         uint64_t msg_length = message.length();
 
@@ -64,7 +77,7 @@ namespace steg {
         }
 
         // save the encoded image
-        src.save(name.c_str());
+        src.save(stego_image.c_str());
     }
 
     std::string StegCoding::LSB_decode(const std::string &name) {

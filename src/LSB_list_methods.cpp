@@ -50,17 +50,17 @@ namespace steg {
                                    const std::vector<int64_t> &list);
 
     int64_t encode_single_byte_list(uint8_t to_encode,
-                               CImg<unsigned char> &image,
-                               int64_t elem,
-                               const std::vector<int64_t> &list);
+                                    CImg<unsigned char> &image,
+                                    int64_t elem,
+                                    const std::vector<int64_t> &list);
 
     char decode_single_byte(CImg<unsigned char> &image,
                             int64_t elem, const std::vector<int64_t> &list);
 
-    static void encode_list_generic(std::string name,
-                                    std::string message,
+    static void encode_list_generic(const std::string &name,
+                                    const std::string &message,
+                                    const std::string &stego_image,
                                     const std::function<std::vector<int64_t>(int64_t)> &f);
-
 
     static std::string decode_list_generic(std::string name,
                                            const std::function<std::vector<int64_t>(int64_t)> &f);
@@ -70,27 +70,45 @@ namespace steg {
     //*****************************************************************
     //*****************************************************************
 
-    void StegCoding::LSB_encode_prime(const std::string& name, const std::string& message) {
-        encode_list_generic(name, message, primes);
+    void StegCoding::LSB_encode_prime(const std::string &name, const std::string &message) {
+        encode_list_generic(name, message, name, primes);
     }
 
-    std::string StegCoding::LSB_decode_prime(const std::string& name) {
+    void StegCoding::LSB_encode_prime(const std::string &name,
+                                      const std::string &message,
+                                      const std::string &stego_image) {
+        encode_list_generic(name, message, stego_image, primes);
+    }
+
+    std::string StegCoding::LSB_decode_prime(const std::string &name) {
         return decode_list_generic(name, primes);
     }
 
-    void StegCoding::LSB_encode_spiral(const std::string& name, const std::string& message) {
-        encode_list_generic(name, message, compute_spiral_matrix);
+    void StegCoding::LSB_encode_spiral(const std::string &name, const std::string &message) {
+        encode_list_generic(name, message, name, compute_spiral_matrix);
     }
 
-    std::string StegCoding::LSB_decode_spiral(const std::string& name) {
+    void StegCoding::LSB_encode_spiral(const std::string &name,
+                                       const std::string &message,
+                                       const std::string &stego_image) {
+        encode_list_generic(name, message, stego_image, compute_spiral_matrix);
+    }
+
+    std::string StegCoding::LSB_decode_spiral(const std::string &name) {
         return decode_list_generic(name, compute_spiral_matrix);
     }
 
-    void StegCoding::LSB_encode_magic_sq(const std::string& name, const std::string& message) {
-        encode_list_generic(name, message, compute_magic_sq_matrix);
+    void StegCoding::LSB_encode_magic_sq(const std::string &name, const std::string &message) {
+        encode_list_generic(name, message, name, compute_magic_sq_matrix);
     }
 
-    std::string StegCoding::LSB_decode_magic_sq(const std::string& name) {
+    void StegCoding::LSB_encode_magic_sq(const std::string &name,
+                                         const std::string &message,
+                                         const std::string &stego_image) {
+        encode_list_generic(name, message, stego_image, compute_magic_sq_matrix);
+    }
+
+    std::string StegCoding::LSB_decode_magic_sq(const std::string &name) {
         return decode_list_generic(name, compute_magic_sq_matrix);
     }
 
@@ -118,8 +136,9 @@ namespace steg {
     }
 
 
-    static void encode_list_generic(std::string name,
-                                    std::string message,
+    static void encode_list_generic(const std::string &name,
+                                    const std::string &message,
+                                    const std::string &stego_image,
                                     const std::function<std::vector<int64_t>(int64_t)> &f) {
 
         CImg<unsigned char> src(name.c_str());
@@ -139,7 +158,7 @@ namespace steg {
             elem = encode_single_byte_list(c, src, elem, prime_n);
         }
 
-        src.save(name.c_str());
+        src.save(stego_image.c_str());
     }
 
 
@@ -165,9 +184,9 @@ namespace steg {
     }
 
     int64_t encode_single_byte_list(uint8_t to_encode,
-                               CImg<unsigned char> &image,
-                               int64_t elem,
-                               const std::vector<int64_t> &list) {
+                                    CImg<unsigned char> &image,
+                                    int64_t elem,
+                                    const std::vector<int64_t> &list) {
 
         int shift_count = BIT_TO_BYTE - 1;
         int bit, i, w, h, pos;
